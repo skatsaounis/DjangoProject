@@ -22,7 +22,7 @@ def index(request):
     context_dict = {
         'categories': category_list,
         'pages': page_list,
-        'boldmessage': "Index Bold Variable",
+        'boldmessage': "Tango with Django",
     }
 
     # Return a rendered response to send to the client.
@@ -35,7 +35,7 @@ def about(request):
 
     # Construct a dictionary to pass to the template engine as its context.
     # Note the key boldmessage is the same as {{ boldmessage }} in the template!
-    context_dict = {'boldmessage': "About Bold Variable"}
+    context_dict = {'boldmessage': "Here is the about page."}
 
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
@@ -72,6 +72,7 @@ def category(request, category_name_slug):
     # Go render the response and return it to the client.
     return render(request, 'rango/category.html', context_dict)
 
+@login_required
 def add_category(request):
     # A HTTP POST?
     if request.method == 'POST':
@@ -96,6 +97,7 @@ def add_category(request):
     # Render the form with error messages (if any).
     return render(request, 'rango/add_category.html', {'form': form})
 
+@login_required
 def add_page(request, category_name_slug):
 
     try:
@@ -226,7 +228,8 @@ def user_login(request):
 # Only logged in users can see this
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
+    context_dict = {}
+    return render(request, 'rango/restricted.html', context_dict)
 
 # Use the login_required() decorator to ensure only those logged in can access the view.
 @login_required
