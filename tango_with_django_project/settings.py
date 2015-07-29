@@ -108,3 +108,8 @@ MEDIA_URL = '/media/'
 # Media directory
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Redirects to login page, if trying to access restricted area
+LOGIN_URL = '/rango/login/'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
