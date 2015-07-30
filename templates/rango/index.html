@@ -4,6 +4,26 @@
 
 {% block title %}Index{% endblock %}
 
+
+{% block map %}
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGgHR762je6jzrsctJFKgZovqa4qx5nB8"></script>
+        <script>
+              
+                var map;
+                function initialize() {
+                map = new google.maps.Map(document.getElementById('map-canvas'), {
+                zoom: 6,
+                center: {lat: 37.4179361, lng: 26.1656567}
+                });
+                }
+
+                google.maps.event.addDomListener(window, 'load', initialize);
+
+        </script>
+
+{% endblock %}
+
+
         {% block body_block %}
 <div class="page-header">
 {% if user.is_authenticated %}
@@ -34,6 +54,9 @@
                 {% endif %}
 
             </div>
+
+       
+
             <div class="col-xs-12 col-sm-6 placeholder">
               <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -50,6 +73,36 @@
                 {% else %}
                     <strong>There are no categories present.</strong>
                 {% endif %}
+            </div>
+
+            <div class="col-xs-12 col-sm-6 placeholder">
+               <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Locations</h3>
+                </div>
+              </div>
+
+              {% if locations %}
+                    <ul class="list-group locations">
+                        {% for location in locations %}
+                         <li class="list-group-item"><a href="{% url 'locations'  location.id %}">{{ location.description }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <strong>There are no locations present.</strong>
+                {% endif %}
+
+            </div>
+
+            <div class="col-xs-12 col-sm-6 placeholder">
+               <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Map</h3>
+                </div>
+              </div>
+
+              <div  style="height: 206px;" id="map-canvas"></div>
+
             </div>
 
           </div>

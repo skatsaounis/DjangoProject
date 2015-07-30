@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 # Import the Category model and Page model
-from rango.models import Category, Page
-from rango.forms import CategoryForm, PageForm
+from rango.models import Category, Page, Location
+from rango.forms import CategoryForm, PageForm, LocationForm
 from rango.forms import UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+import simplejson
 
 def index(request):
 
@@ -19,10 +20,12 @@ def index(request):
     # Note the key boldmessage is the same as {{ boldmessage }} in the template!
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
+    location_list = Location.objects.order_by('description')[:5]
 
     context_dict = {
         'categories': category_list,
         'pages': page_list,
+        'locations': location_list,
         'boldmessage': "Tango with Django",
     }
 
@@ -106,6 +109,40 @@ def category(request, category_name_slug):
 
     # Go render the response and return it to the client.
     return render(request, 'rango/category.html', context_dict)
+
+
+
+@login_required
+def add_location(request):
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = LocationForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            
+            location = form.save(commit=False)
+            location.user = request.user
+            # Save the new category to the database.
+            location.save()
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            return index(request)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = LocationForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'rango/add_location.html', {'form': form})
+
+
+
+
 
 @login_required
 def add_category(request):
@@ -291,4 +328,39 @@ def like_category(request):
             cat.save()
 
     return HttpResponse(likes)
+
+
+def get_category_list(max_results=0, starts_with=''):
+        cat_list = []
+        if starts_with:
+                cat_list = Category.objects.filter(name__istartswith=starts_with)
+
+        if max_results > 0:
+                if len(cat_list) > max_results:
+                        cat_list = cat_list[:max_results]
+
+        return cat_list
+
+def suggest_category(request):
+
+        cat_list = []
+        starts_with = ''
+        if request.method == 'GET':
+                starts_with = request.GET['suggestion']
+
+        cat_list = get_category_list(8, starts_with)
+
+        return render(request, 'rango/category_list.html', {'cat_list': cat_list })
+
+
+def json(request, location_id):
+
+    loc = Location.objects.get(id=location_id)
+    if loc:
+        jsonarray = {'description': loc.description, 'longtitude': loc.longtitude, 'latitude': loc.latitude,}
+        jsonreturn = simplejson.dumps(jsonarray)
+
+    return HttpResponse(jsonreturn)
+
+
 

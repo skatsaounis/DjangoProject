@@ -1,6 +1,17 @@
 from django import forms
-from rango.models import Page, Category, UserProfile
+from rango.models import Page, Category, UserProfile, Location
 from django.contrib.auth.models import User
+
+class LocationForm(forms.ModelForm):
+    description = forms.CharField(max_length=128, help_text="Please enter the location description.")
+    longtitude = forms.FloatField(initial=0, help_text="Please enter the location longtitude.")
+    latitude = forms.FloatField(initial=0, help_text="Please enter the location latitude.")
+    
+    # An inline class to provide additional information on the form.
+    class Meta:
+        # Provide an association between the ModelForm and a model
+        model = Location
+        exclude = ('user',)
 
 class CategoryForm(forms.ModelForm):
     name = forms.CharField(max_length=128, help_text="Please enter the category name.")
