@@ -1,4 +1,3 @@
 *.pyc
 manage.py
-__*
 db.sqlite3
